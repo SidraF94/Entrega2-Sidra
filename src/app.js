@@ -3,7 +3,7 @@ import productsRouter from "./routes/products.js";
 import cartsRouter from "./routes/carts.js";
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = 8080;
 
 // Middleware de parseo de JSON para req.body
 app.use(express.json());
