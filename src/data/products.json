@@ -1,0 +1,35 @@
+[
+  {
+    "id": "1e31bf39-7196-4cae-8b0c-c57738442ed1",
+    "title": "Azucar",
+    "description": "Azucar de 1 kg.",
+    "code": "A-001",
+    "price": 1200,
+    "status": true,
+    "stock": 80,
+    "category": "Ingredientes",
+    "thumbnails": []
+  },
+  {
+    "id": "762f7173-28f8-45d4-ab58-4d71e52c4c68",
+    "title": "Sal",
+    "description": "Sal de 200 gr.",
+    "code": "SA-001",
+    "price": 700,
+    "status": true,
+    "stock": 20,
+    "category": "Condimento",
+    "thumbnails": []
+  },
+  {
+    "id": "fe1de985-f40f-40d1-b615-823e677f949c",
+    "title": "Café",
+    "description": "Frasco de café de 1 kg.",
+    "code": "CA-001",
+    "price": 1700,
+    "status": true,
+    "stock": 25,
+    "category": "Bebidas",
+    "thumbnails": []
+  }
+]
