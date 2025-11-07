@@ -81,8 +81,7 @@
     socket.on("connect", () => {
         console.log("Conectado al servidor");
     });
-///////////////////////////////////////////////////////////////////////////////
-    // Función para iniciar carrusel de imágenes
+    // función para iniciar carrusel de imágenes
     function startImageCarousel(productId) {
         const container = document.querySelector(`.product-image-container[data-product-id="${productId}"]`);
         if (!container) return;
@@ -108,8 +107,7 @@
             }
         });
     });
-//////////////////////////////////////////////////////////////////////////////////
-    // Desconectar al salir de la página
+    // desconectar al salir de la página
     window.addEventListener("beforeunload", () => {
         socket.disconnect();
     });

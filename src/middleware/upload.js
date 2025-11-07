@@ -7,22 +7,22 @@ const __dirname = path.dirname(__filename);
 
 const imagesDir = path.join(__dirname, "../data/images");
 
-// Configuración de almacenamiento
+// configuración de almacenamiento
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
     callback(null, imagesDir);
   },
   filename: (req, file, callback) => {
-    // Generar nombre único para el archivo
+    // Genero nombre único para el archivo
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname);
     callback(null, `product-${uniqueSuffix}${ext}`);
   },
 });
 
-// Filtro para aceptar solo imágenes
+// filtro para aceptar solo imágenes
 const fileFilter = (req, file, callback) => {
-  const allowedTypes = /jpeg|jpg|png|gif|webp/;
+  const allowedTypes = /jpeg|jpg|png|webp/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = allowedTypes.test(file.mimetype);
 

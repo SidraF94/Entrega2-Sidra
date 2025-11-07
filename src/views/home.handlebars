@@ -104,7 +104,6 @@
         }
     });
 
-//////////////////////////////////////////////////////////////////////////////////
     // Función para iniciar carrusel de imágenes
     function startImageCarousel(productId) {
         const container = document.querySelector(`.product-image-container[data-product-id="${productId}"]`);
@@ -132,9 +131,8 @@
             }
         });
     });
-//////////////////////////////////////////////////////////////////////////////////
 
-    // Desconectar al salir de la página
+    // desconectar al salir de la página
     window.addEventListener("beforeunload", () => {
         socket.disconnect();
     });
