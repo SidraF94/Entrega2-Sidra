@@ -1,35 +1,112 @@
 [
   {
-    "id": "1e31bf39-7196-4cae-8b0c-c57738442ed1",
-    "title": "Azucar",
-    "description": "Azucar de 1 kg.",
-    "code": "A-001",
-    "price": 1200,
+    "id": "7d19f657-aab8-4d1d-a395-a8c42b563294",
+    "title": "Sal Celusal",
+    "description": "Sal para salar las comidas",
+    "code": "S-001",
+    "price": 800,
+    "stock": 50,
+    "category": "Condimentos",
     "status": true,
-    "stock": 80,
-    "category": "Ingredientes",
-    "thumbnails": []
+    "thumbnails": [
+      "/images/product-1762523853517-522257635.jpg"
+    ]
   },
   {
-    "id": "762f7173-28f8-45d4-ab58-4d71e52c4c68",
-    "title": "Sal",
-    "description": "Sal de 200 gr.",
-    "code": "SA-001",
-    "price": 700,
+    "id": "cb4e04f0-dacb-4349-87e6-a13262e88a0a",
+    "title": "Fideos Spaghetti",
+    "description": "Spaghettis para comer con salsa roja o blanca o ambas.",
+    "code": "FD-001",
+    "price": 1000,
+    "stock": 40,
+    "category": "Pastas",
     "status": true,
-    "stock": 20,
-    "category": "Condimento",
-    "thumbnails": []
+    "thumbnails": [
+      "/images/product-1762523920770-745192627.jpg",
+      "/images/product-1762523920770-275702058.jpg",
+      "/images/product-1762523920770-83254805.jpg",
+      "/images/product-1762523920770-693721400.jpg"
+    ]
   },
   {
-    "id": "fe1de985-f40f-40d1-b615-823e677f949c",
-    "title": "Café",
-    "description": "Frasco de café de 1 kg.",
+    "id": "2c54c3d3-0f21-427d-9868-263da6a60d90",
+    "title": "Cafe",
+    "description": "Cafe negro para el desayuno o para aguantar el día.",
     "code": "CA-001",
-    "price": 1700,
+    "price": 1500,
+    "stock": 30,
+    "category": "Infusiones",
     "status": true,
+    "thumbnails": [
+      "/images/product-1762524004981-923770581.jpg"
+    ]
+  },
+  {
+    "id": "25ece4a5-a746-46d3-a4ad-a7b183351ef6",
+    "title": "Azucar ",
+    "description": "Azúcar para endulzar las cosas de la vida",
+    "code": "AZ-001",
+    "price": 900,
+    "stock": 60,
+    "category": "Condimentos",
+    "status": true,
+    "thumbnails": [
+      "/images/product-1762524067695-732080805.jpg",
+      "/images/product-1762524067695-197857427.jpg"
+    ]
+  },
+  {
+    "id": "0f1a88f7-0490-4553-9fd2-59a7d464e84a",
+    "title": "Ñoquis",
+    "description": "Ñoquis de papa y huevo como los de la nona.",
+    "code": "GN-001",
+    "price": 1500,
+    "stock": 20,
+    "category": "Pastas",
+    "status": true,
+    "thumbnails": [
+      "/images/product-1762524124174-416618334.jpeg",
+      "/images/product-1762524124175-849740685.jpg",
+      "/images/product-1762524124175-129900047.jpg"
+    ]
+  },
+  {
+    "id": "7f38c3e9-0dd7-4159-89a7-d419d992f3d6",
+    "title": "Aceite 500ml",
+    "description": "Aceite de girasol de 500 ml.",
+    "code": "AC-001",
+    "price": 2000,
     "stock": 25,
-    "category": "Bebidas",
-    "thumbnails": []
+    "category": "Aderezos",
+    "status": true,
+    "thumbnails": [
+      "/images/product-1762524193283-541033560.jpg"
+    ]
+  },
+  {
+    "id": "3499dbc1-5daa-4998-a9a7-1074122d8213",
+    "title": "Aceite 1L",
+    "description": "Aceite de girasol de 1l.",
+    "code": "AC-002",
+    "price": 4000,
+    "stock": 20,
+    "category": "Aderezos",
+    "status": true,
+    "thumbnails": [
+      "/images/product-1762524268359-294350371.jpg"
+    ]
+  },
+  {
+    "id": "d2d907f9-dea5-4264-9ec5-bf5e92fa473d",
+    "title": "Aceite de Oliva",
+    "description": "Aceite de olivas, para comer mas sano",
+    "code": "AC-003",
+    "price": 12000,
+    "stock": 15,
+    "category": "Aderezos",
+    "status": true,
+    "thumbnails": [
+      "/images/product-1762524479221-455747212.jpg"
+    ]
   }
 ]
