@@ -108,5 +108,18 @@
     "thumbnails": [
       "/images/product-1762524479221-455747212.jpg"
     ]
+  },
+  {
+    "id": "a8d57d83-3ae3-4221-ac70-fc1594c76ce8",
+    "title": "Yerba Nobleza Gaucha",
+    "description": "Yerba para desayunar con criollitos.",
+    "code": "Y-001",
+    "price": 500,
+    "stock": 45,
+    "category": "Infusiones",
+    "status": true,
+    "thumbnails": [
+      "/images/product-1762534987201-486464055.jpg"
+    ]
   }
 ]

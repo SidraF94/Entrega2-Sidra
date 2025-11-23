@@ -1,0 +1,127 @@
+<div class="products-container">
+  <h2>Lista de Productos</h2>
+
+  <!-- Filtros y ordenamiento -->
+  <div class="filters-container">
+    <form method="GET" action="/products" class="filters-form">
+      <div class="filter-group">
+        <label for="query">Buscar por categoría o disponibilidad:</label>
+        <input type="text" id="query" name="query" value="{{pagination.query}}" placeholder="Ej: Pastas, available">
+      </div>
+      
+      <div class="filter-group">
+        <label for="sort">Ordenar por precio:</label>
+        <select id="sort" name="sort">
+          <option value="">Sin ordenar</option>
+          <option value="asc" {{#if (eq pagination.sort 'asc')}}selected{{/if}}>Menor a Mayor</option>
+          <option value="desc" {{#if (eq pagination.sort 'desc')}}selected{{/if}}>Mayor a Menor</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="limit">Productos por página:</label>
+        <select id="limit" name="limit">
+          <option value="5" {{#if (eq pagination.limit 5)}}selected{{/if}}>5</option>
+          <option value="10" {{#if (eq pagination.limit 10)}}selected{{/if}}>10</option>
+          <option value="20" {{#if (eq pagination.limit 20)}}selected{{/if}}>20</option>
+        </select>
+      </div>
+
+      <button type="submit">Aplicar Filtros</button>
+    </form>
+  </div>
+
+  <!-- Lista de productos -->
+  {{#if products}}
+    <div class="products-grid">
+      {{#each products}}
+        <div class="product-card">
+          {{#if this.thumbnails}}
+            {{#if (gt this.thumbnails.length 0)}}
+              <div class="product-image-container">
+                <img src="/api/images/{{this.id}}/0" alt="{{this.title}}" class="product-image" onerror="this.style.display='none'">
+              </div>
+            {{else}}
+              <div class="product-image-placeholder">Sin imagen</div>
+            {{/if}}
+          {{else}}
+            <div class="product-image-placeholder">Sin imagen</div>
+          {{/if}}
+          
+          <h3>{{this.title}}</h3>
+          <p class="product-price">${{this.price}}</p>
+          <p class="product-stock">Stock: {{this.stock}}</p>
+          <p><strong>Categoría:</strong> {{this.category}}</p>
+          
+          <div class="product-actions">
+            <a href="/products/{{this.id}}" class="btn btn-primary">Ver Detalles</a>
+            <button onclick="addToCart('{{this.id}}')" class="btn btn-success">Agregar al Carrito</button>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  {{else}}
+    <div class="empty-state">
+      <p>No hay productos disponibles</p>
+    </div>
+  {{/if}}
+
+  <!-- Paginación -->
+  {{#if pagination}}
+    <div class="pagination">
+      {{#if pagination.hasPrevPage}}
+        <a href="{{pagination.prevLink}}" class="btn btn-secondary">← Anterior</a>
+      {{else}}
+        <span class="btn btn-secondary disabled">← Anterior</span>
+      {{/if}}
+
+      <span class="page-info">
+        Página {{pagination.page}} de {{pagination.totalPages}}
+      </span>
+
+      {{#if pagination.hasNextPage}}
+        <a href="{{pagination.nextLink}}" class="btn btn-secondary">Siguiente →</a>
+      {{else}}
+        <span class="btn btn-secondary disabled">Siguiente →</span>
+      {{/if}}
+    </div>
+  {{/if}}
+</div>
+
+<script>
+  async function addToCart(productId) {
+    try {
+      // Primero crear o obtener un carrito (por simplicidad, creamos uno nuevo cada vez)
+      // En producción, deberías manejar el carrito del usuario de forma persistente
+      const createCartResponse = await fetch('/api/carts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const cart = await createCartResponse.json();
+      
+      // Agregar producto al carrito
+      const addResponse = await fetch(`/api/carts/${cart.id}/product/${productId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ quantity: 1 })
+      });
+
+      if (addResponse.ok) {
+        alert('Producto agregado al carrito!');
+        // Opcional: redirigir al carrito
+        // window.location.href = `/carts/${cart.id}`;
+      } else {
+        alert('Error al agregar producto al carrito');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al agregar producto al carrito');
+    }
+  }
+</script>
+

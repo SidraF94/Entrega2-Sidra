@@ -1,0 +1,102 @@
+<div class="cart-container">
+  <h2>Carrito de Compras</h2>
+  <a href="/products" class="back-link">← Continuar comprando</a>
+
+  {{#if cart}}
+    {{#if cart.products}}
+      <div class="cart-items">
+        {{#each cart.products}}
+          {{#if this.productId}}
+            <div class="cart-item">
+              <div class="cart-item-image">
+                {{#if this.productId.thumbnails}}
+                  <img src="/api/images/{{this.productId.id}}/0" alt="{{this.productId.title}}" onerror="this.style.display='none'">
+                {{else}}
+                  <div class="image-placeholder">Sin imagen</div>
+                {{/if}}
+              </div>
+
+              <div class="cart-item-info">
+                <h3>{{this.productId.title}}</h3>
+                <p class="cart-item-description">{{this.productId.description}}</p>
+                <p class="cart-item-category">Categoría: {{this.productId.category}}</p>
+              </div>
+
+              <div class="cart-item-details">
+                <p class="cart-item-price">${{this.productId.price}}</p>
+                <p class="cart-item-quantity">Cantidad: {{this.quantity}}</p>
+                <p class="cart-item-total">Total: ${{multiply this.productId.price this.quantity}}</p>
+              </div>
+
+              <div class="cart-item-actions">
+                <button onclick="removeFromCart('{{../cart.id}}', '{{this.productId.id}}')" class="btn btn-danger">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          {{/if}}
+        {{/each}}
+      </div>
+
+      <div class="cart-summary">
+        <h3>Resumen del Carrito</h3>
+        <p><strong>Total de productos:</strong> {{cart.products.length}}</p>
+        <p class="cart-total"><strong>Total a pagar:</strong> ${{calculateTotal cart.products}}</p>
+        <button onclick="clearCart('{{cart.id}}')" class="btn btn-danger">Vaciar Carrito</button>
+      </div>
+    {{else}}
+      <div class="empty-cart">
+        <p>El carrito está vacío</p>
+        <a href="/products" class="btn btn-primary">Ir a Productos</a>
+      </div>
+    {{/if}}
+  {{else}}
+    <div class="error-message">
+      <p>Carrito no encontrado</p>
+    </div>
+  {{/if}}
+</div>
+
+<script>
+
+  async function removeFromCart(cartId, productId) {
+    try {
+      const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        alert('Producto eliminado del carrito');
+        location.reload();
+      } else {
+        alert('Error al eliminar producto');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al eliminar producto');
+    }
+  }
+
+  async function clearCart(cartId) {
+    if (!confirm('¿Estás seguro de que quieres vaciar el carrito?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/carts/${cartId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        alert('Carrito vaciado');
+        location.reload();
+      } else {
+        alert('Error al vaciar carrito');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al vaciar carrito');
+    }
+  }
+</script>
+

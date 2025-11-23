@@ -1,24 +1,8 @@
 import multer from "multer";
 import path from "path";
-import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const imagesDir = path.join(__dirname, "../data/images");
-
-// configuración de almacenamiento
-const storage = multer.diskStorage({
-  destination: (req, file, callback) => {
-    callback(null, imagesDir);
-  },
-  filename: (req, file, callback) => {
-    // Genero nombre único para el archivo
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    callback(null, `product-${uniqueSuffix}${ext}`);
-  },
-});
+// Usar almacenamiento en memoria para convertir a Base64
+const storage = multer.memoryStorage();
 
 // filtro para aceptar solo imágenes
 const fileFilter = (req, file, callback) => {
