@@ -1,12 +1,17 @@
 <div class="products-container">
-  <h2>Lista de Productos</h2>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>Lista de Productos</h2>
+    <button id="viewCartBtn" onclick="viewCart()" class="btn btn-cart" style="display: none;">
+      Ver Carrito
+    </button>
+  </div>
 
   <!-- Filtros y orden -->
   <div class="filters-container">
     <form method="GET" action="/products" class="filters-form">
       <div class="filter-group">
         <label for="query">Buscar por categoría o disponibilidad:</label>
-        <input type="text" id="query" name="query" value="{{pagination.query}}" placeholder="Ej: Pastas, available">
+        <input type="text" id="query" name="query" value="{{pagination.query}}" placeholder="Ej: Pastas, Aderezos">
       </div>
       
       <div class="filter-group">
@@ -54,8 +59,8 @@
           <p><strong>Categoría:</strong> {{this.category}}</p>
           
           <div class="product-actions">
-            <a href="/products/{{this._id}}" class="btn btn-primary">Ver Detalles</a>
-            <button onclick="addToCart('{{this._id}}')" class="btn btn-success">Agregar al Carrito</button>
+            <a href="/products/{{this._id}}" class="btn btn-default">Ver Detalles</a>
+            <button onclick="addToCart('{{this._id}}')" class="btn btn-default">Agregar al Carrito</button>
           </div>
         </div>
       {{/each}}
@@ -89,23 +94,48 @@
 </div>
 
 <script>
+  // Mostrar/ocultar botón de carrito según sessionStorage
+  function updateCartButton() {
+    const cartId = sessionStorage.getItem('cartId');
+    const viewCartBtn = document.getElementById('viewCartBtn');
+    if (viewCartBtn) {
+      viewCartBtn.style.display = cartId ? 'block' : 'none';
+    }
+  }
+
+  function viewCart() {
+    const cartId = sessionStorage.getItem('cartId');
+    if (cartId) {
+      window.location.href = `/carts/${cartId}`;
+    }
+  }
+
+  // Verificar al cargar la página
+  document.addEventListener('DOMContentLoaded', updateCartButton);
+
   async function addToCart(productId) {
     try {
-      const createCartResponse = await fetch('/api/carts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+      let cartId = sessionStorage.getItem('cartId');
+
+      if (!cartId) {
+        const createCartResponse = await fetch('/api/carts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!createCartResponse.ok) {
+          const errorData = await createCartResponse.json();
+          throw new Error(errorData.error || 'Error al crear carrito');
         }
-      });
-      
-      if (!createCartResponse.ok) {
-        const errorData = await createCartResponse.json();
-        throw new Error(errorData.error || 'Error al crear carrito');
+
+        const newCart = await createCartResponse.json();
+        cartId = newCart._id;
+        sessionStorage.setItem('cartId', cartId);
       }
       
-      const cart = await createCartResponse.json();
-      
-      const addResponse = await fetch(`/api/carts/${cart._id}/product/${productId}`, {
+      const addResponse = await fetch(`/api/carts/${cartId}/product/${productId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -115,6 +145,7 @@
 
       if (addResponse.ok) {
         alert('Producto agregado al carrito!');
+        updateCartButton(); // Actualizar visibilidad del botón
       } else {
         const errorData = await addResponse.json();
         throw new Error(errorData.error || 'Error al agregar producto al carrito');
