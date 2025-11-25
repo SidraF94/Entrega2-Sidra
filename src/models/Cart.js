@@ -22,12 +22,9 @@ const cartSchema = new mongoose.Schema({
     default: []
   }
 }, {
-  timestamps: true // Agrega createdAt y updatedAt automáticamente
+  timestamps: true
 });
 
 const Cart = mongoose.model("Cart", cartSchema);
 
 export default Cart;
-
-
-

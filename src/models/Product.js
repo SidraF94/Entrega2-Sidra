@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 
 const productSchema = new mongoose.Schema({
   title: {
@@ -41,26 +42,27 @@ const productSchema = new mongoose.Schema({
     type: [
       {
         data: {
-          type: String, // Base64 string de la imagen
-          required: true
+          type: String,
+          required: false
         },
         contentType: {
-          type: String, // image/jpeg, image/png, etc.
-          required: true
+          type: String,
+          required: false
         },
         filename: {
           type: String,
-          required: true
+          required: false
         }
       }
     ],
     default: []
   }
 }, {
-  timestamps: true // Agrega createdAt y updatedAt automáticamente
+  timestamps: true
 });
+
+productSchema.plugin(mongoosePaginate);
 
 const Product = mongoose.model("Product", productSchema);
 
 export default Product;
-

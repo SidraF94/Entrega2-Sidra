@@ -1,10 +1,8 @@
 import multer from "multer";
 import path from "path";
 
-// Usar almacenamiento en memoria para convertir a Base64
 const storage = multer.memoryStorage();
 
-// filtro para aceptar solo imágenes
 const fileFilter = (req, file, callback) => {
   const allowedTypes = /jpeg|jpg|png|webp/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());

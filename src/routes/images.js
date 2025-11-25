@@ -4,8 +4,6 @@ import ProductManager from "../managers/ProductManager.js";
 const router = express.Router();
 const productManager = new ProductManager();
 
-// Ruta para servir imágenes desde Base64 almacenado en MongoDB
-// Formato: /api/images/:productId/:thumbnailIndex
 router.get("/:productId/:thumbnailIndex", async (req, res) => {
   try {
     const productId = req.params.productId;
@@ -22,12 +20,10 @@ router.get("/:productId/:thumbnailIndex", async (req, res) => {
 
     const thumbnail = product.thumbnails[thumbnailIndex];
     
-    // Convertir Base64 a buffer y enviar
     const imageBuffer = Buffer.from(thumbnail.data, 'base64');
     res.set('Content-Type', thumbnail.contentType);
     res.send(imageBuffer);
   } catch (error) {
-    console.error("Error en GET /api/images/:productId/:thumbnailIndex:", error);
     res.status(500).json({ error: "Error al obtener imagen" });
   }
 });

@@ -1,7 +1,7 @@
 <div class="products-container">
   <h2>Lista de Productos</h2>
 
-  <!-- Filtros y ordenamiento -->
+  <!-- Filtros y orden -->
   <div class="filters-container">
     <form method="GET" action="/products" class="filters-form">
       <div class="filter-group">
@@ -37,9 +37,9 @@
       {{#each products}}
         <div class="product-card">
           {{#if this.thumbnails}}
-            {{#if (gt this.thumbnails.length 0)}}
+            {{#if this.thumbnails.length}}
               <div class="product-image-container">
-                <img src="/api/images/{{this.id}}/0" alt="{{this.title}}" class="product-image" onerror="this.style.display='none'">
+                <img src="/api/images/{{this._id}}/0" alt="{{this.title}}" class="product-image active" onerror="this.style.display='none'">
               </div>
             {{else}}
               <div class="product-image-placeholder">Sin imagen</div>
@@ -54,8 +54,8 @@
           <p><strong>Categoría:</strong> {{this.category}}</p>
           
           <div class="product-actions">
-            <a href="/products/{{this.id}}" class="btn btn-primary">Ver Detalles</a>
-            <button onclick="addToCart('{{this.id}}')" class="btn btn-success">Agregar al Carrito</button>
+            <a href="/products/{{this._id}}" class="btn btn-primary">Ver Detalles</a>
+            <button onclick="addToCart('{{this._id}}')" class="btn btn-success">Agregar al Carrito</button>
           </div>
         </div>
       {{/each}}
@@ -91,8 +91,6 @@
 <script>
   async function addToCart(productId) {
     try {
-      // Primero crear o obtener un carrito (por simplicidad, creamos uno nuevo cada vez)
-      // En producción, deberías manejar el carrito del usuario de forma persistente
       const createCartResponse = await fetch('/api/carts', {
         method: 'POST',
         headers: {
@@ -100,10 +98,14 @@
         }
       });
       
+      if (!createCartResponse.ok) {
+        const errorData = await createCartResponse.json();
+        throw new Error(errorData.error || 'Error al crear carrito');
+      }
+      
       const cart = await createCartResponse.json();
       
-      // Agregar producto al carrito
-      const addResponse = await fetch(`/api/carts/${cart.id}/product/${productId}`, {
+      const addResponse = await fetch(`/api/carts/${cart._id}/product/${productId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -113,14 +115,12 @@
 
       if (addResponse.ok) {
         alert('Producto agregado al carrito!');
-        // Opcional: redirigir al carrito
-        // window.location.href = `/carts/${cart.id}`;
       } else {
-        alert('Error al agregar producto al carrito');
+        const errorData = await addResponse.json();
+        throw new Error(errorData.error || 'Error al agregar producto al carrito');
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error al agregar producto al carrito');
+      alert('Error: ' + error.message);
     }
   }
 </script>

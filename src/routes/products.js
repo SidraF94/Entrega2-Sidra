@@ -5,19 +5,15 @@ import upload from "../middleware/upload.js";
 const router = express.Router();
 const productManager = new ProductManager();
 
-// Rutas de productos
 router.get("/", async (req, res) => {
   try {
-    // Obtener query params
     const limit = parseInt(req.query.limit) || 10;
     const page = parseInt(req.query.page) || 1;
-    const sort = req.query.sort; // 'asc' o 'desc'
-    const query = req.query.query; // filtro por categoría o disponibilidad
+    const sort = req.query.sort;
+    const query = req.query.query;
 
-    // Obtener productos paginados
     const result = await productManager.getPaginated({ limit, page, sort, query });
 
-    // Construir URLs de paginación
     const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}${req.path}`;
     const queryParams = new URLSearchParams();
     
@@ -33,7 +29,6 @@ router.get("/", async (req, res) => {
       ? `${baseUrl}?${queryParams.toString()}&page=${result.nextPage}`
       : null;
 
-    // Formato de respuesta requerido
     res.json({
       status: 'success',
       payload: result.products,
@@ -56,7 +51,6 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    // Validar formato de ID
     if (!req.params.id || req.params.id.length !== 24) {
       return res.status(400).json({ error: "ID de producto inválido" });
     }
@@ -65,14 +59,12 @@ router.get("/:id", async (req, res) => {
     if (!product) return res.status(404).json({ error: "Producto no encontrado" });
     res.json(product);
   } catch (err) {
-    console.error("Error en GET /api/products/:id:", err);
     res.status(500).json({ error: err.message || "Error interno del servidor" });
   }
 });
 
 router.post("/", upload.array("thumbnails", 5), async (req, res) => {
   try {
-    // Validar campos requeridos
     const requiredFields = ['title', 'description', 'code', 'price', 'stock', 'category'];
     const missingFields = requiredFields.filter(field => !req.body[field]);
     
@@ -82,7 +74,6 @@ router.post("/", upload.array("thumbnails", 5), async (req, res) => {
       });
     }
 
-    // Validar tipos de datos
     const price = parseFloat(req.body.price);
     const stock = parseInt(req.body.stock);
 
@@ -94,11 +85,9 @@ router.post("/", upload.array("thumbnails", 5), async (req, res) => {
       return res.status(400).json({ error: "El stock debe ser un número mayor o igual a 0" });
     }
 
-    // Convertir imágenes a Base64 y guardarlas en el documento
     const thumbnails = [];
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
-        // Convertir buffer a Base64
         const base64Data = file.buffer.toString('base64');
         thumbnails.push({
           data: base64Data,
@@ -108,7 +97,6 @@ router.post("/", upload.array("thumbnails", 5), async (req, res) => {
       }
     }
     
-    // parsear status correctamente
     let status = true;
     if (req.body.status !== undefined) {
       status = req.body.status === "true" || req.body.status === true || req.body.status === "1";
@@ -125,22 +113,16 @@ router.post("/", upload.array("thumbnails", 5), async (req, res) => {
       thumbnails: thumbnails
     };
 
-    console.log("Datos del producto recibidos:", productData);
-
     const product = await productManager.add(productData);
-    console.log("Producto creado:", product);
+    const productPlain = product.toObject();
+    productPlain._id = productPlain._id.toString();
     
-    // emit para actualizar cliente en tiempo real
     if (req.io) {
-      req.io.emit("productAdded", product);
-      console.log("productAdded emitido para producto:", product.id);
+      req.io.emit("productAdded", productPlain);
     }
     
-    res.status(201).json(product);
+    res.status(201).json(productPlain);
   } catch (err) {
-    console.error("Error en POST /api/products:", err);
-    
-    // Manejar errores específicos de validación de Mongoose
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map(e => e.message);
       return res.status(400).json({ error: `Error de validación: ${errors.join(', ')}` });
@@ -152,12 +134,10 @@ router.post("/", upload.array("thumbnails", 5), async (req, res) => {
 
 router.put("/:id", upload.array("thumbnails", 5), async (req, res) => {
   try {
-    // Validar que el ID sea válido
     if (!req.params.id || req.params.id.length !== 24) {
       return res.status(400).json({ error: "ID de producto inválido" });
     }
 
-    // Obtener producto actual para mantener imágenes existentes
     const currentProduct = await productManager.getById(req.params.id);
     if (!currentProduct) {
       return res.status(404).json({ error: "Producto no encontrado" });
@@ -165,7 +145,6 @@ router.put("/:id", upload.array("thumbnails", 5), async (req, res) => {
 
     let thumbnails = currentProduct.thumbnails || [];
     
-    // Convertir nuevas imágenes a Base64
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         const base64Data = file.buffer.toString('base64');
@@ -177,10 +156,8 @@ router.put("/:id", upload.array("thumbnails", 5), async (req, res) => {
       }
     }
 
-    // Validar y preparar datos de actualización
     const updateData = { ...req.body };
     
-    // Validar precio si se proporciona
     if (updateData.price !== undefined) {
       const price = parseFloat(updateData.price);
       if (isNaN(price) || price < 0) {
@@ -189,7 +166,6 @@ router.put("/:id", upload.array("thumbnails", 5), async (req, res) => {
       updateData.price = price;
     }
 
-    // Validar stock si se proporciona
     if (updateData.stock !== undefined) {
       const stock = parseInt(updateData.stock);
       if (isNaN(stock) || stock < 0) {
@@ -198,27 +174,23 @@ router.put("/:id", upload.array("thumbnails", 5), async (req, res) => {
       updateData.stock = stock;
     }
 
-    // Validar status si se proporciona
     if (updateData.status !== undefined) {
       updateData.status = updateData.status === "true" || updateData.status === true || updateData.status === "1";
     }
 
-    // Agregar thumbnails al objeto de actualización
     updateData.thumbnails = thumbnails;
 
     const updated = await productManager.update(req.params.id, updateData);
     if (!updated) return res.status(404).json({ error: "Producto no encontrado" });
     
-    // Emitir evento WebSocket para actualizar clientes en tiempo real
-    if (req.io) {
-      req.io.emit("productUpdated", updated);
-    }
-    console.log("Producto modificado exitosamente.");
-    res.json(updated);
-  } catch (err) {
-    console.error("Error en PUT /api/products/:id:", err);
+    const updatedPlain = updated.toObject();
+    updatedPlain._id = updatedPlain._id.toString();
     
-    // Manejar errores específicos de validación de Mongoose
+    if (req.io) {
+      req.io.emit("productUpdated", updatedPlain);
+    }
+    res.json(updatedPlain);
+  } catch (err) {
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map(e => e.message);
       return res.status(400).json({ error: `Error de validación: ${errors.join(', ')}` });
@@ -230,7 +202,6 @@ router.put("/:id", upload.array("thumbnails", 5), async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    // Validar formato de ID
     if (!req.params.id || req.params.id.length !== 24) {
       return res.status(400).json({ error: "ID de producto inválido" });
     }
@@ -238,14 +209,11 @@ router.delete("/:id", async (req, res) => {
     const ok = await productManager.delete(req.params.id);
     if (!ok) return res.status(404).json({ error: "Producto no encontrado" });
     
-    // Emitir evento WebSocket para actualizar clientes en tiempo real
     if (req.io) {
       req.io.emit("productDeleted", req.params.id);
     }
-    console.log("Producto eliminado correctamente");
     res.status(200).json({ message: "Producto eliminado correctamente" });
   } catch (err) {
-    console.error("Error en DELETE /api/products/:id:", err);
     res.status(500).json({ error: err.message || "Error interno del servidor" });
   }
 });

@@ -10,7 +10,7 @@
             <div class="cart-item">
               <div class="cart-item-image">
                 {{#if this.productId.thumbnails}}
-                  <img src="/api/images/{{this.productId.id}}/0" alt="{{this.productId.title}}" onerror="this.style.display='none'">
+                  <img src="/api/images/{{this.productId._id}}/0" alt="{{this.productId.title}}" onerror="this.style.display='none'">
                 {{else}}
                   <div class="image-placeholder">Sin imagen</div>
                 {{/if}}
@@ -25,11 +25,11 @@
               <div class="cart-item-details">
                 <p class="cart-item-price">${{this.productId.price}}</p>
                 <p class="cart-item-quantity">Cantidad: {{this.quantity}}</p>
-                <p class="cart-item-total">Total: ${{multiply this.productId.price this.quantity}}</p>
+                <p class="cart-item-total">Total: ${{this.itemTotal}}</p>
               </div>
 
               <div class="cart-item-actions">
-                <button onclick="removeFromCart('{{../cart.id}}', '{{this.productId.id}}')" class="btn btn-danger">
+                <button onclick="removeFromCart('{{../cart._id}}', '{{this.productId._id}}')" class="btn btn-danger">
                   Eliminar
                 </button>
               </div>
@@ -41,8 +41,8 @@
       <div class="cart-summary">
         <h3>Resumen del Carrito</h3>
         <p><strong>Total de productos:</strong> {{cart.products.length}}</p>
-        <p class="cart-total"><strong>Total a pagar:</strong> ${{calculateTotal cart.products}}</p>
-        <button onclick="clearCart('{{cart.id}}')" class="btn btn-danger">Vaciar Carrito</button>
+        <p class="cart-total"><strong>Total a pagar:</strong> ${{cart.total}}</p>
+        <button onclick="clearCart('{{cart._id}}')" class="btn btn-danger">Vaciar Carrito</button>
       </div>
     {{else}}
       <div class="empty-cart">
@@ -72,13 +72,12 @@
         alert('Error al eliminar producto');
       }
     } catch (error) {
-      console.error('Error:', error);
       alert('Error al eliminar producto');
     }
   }
 
   async function clearCart(cartId) {
-    if (!confirm('¿Estás seguro de que quieres vaciar el carrito?')) {
+    if (!confirm('Estás seguro de que queres vaciar el carrito?')) {
       return;
     }
 
@@ -94,7 +93,6 @@
         alert('Error al vaciar carrito');
       }
     } catch (error) {
-      console.error('Error:', error);
       alert('Error al vaciar carrito');
     }
   }

@@ -1,10 +1,21 @@
 import Product from "../models/Product.js";
 
+const formatProduct = product => {
+  if (!product) return product;
+  const objectIdToString = value =>
+    value && typeof value.toString === "function" ? value.toString() : value;
+
+  return {
+    ...product,
+    _id: objectIdToString(product._id)
+  };
+};
+
 export default class ProductManager {
   async getAll() {
     try {
-      const products = await Product.find({});
-      return products;
+      const products = await Product.find({}).lean();
+      return products.map(formatProduct);
     } catch (error) {
       throw new Error(`Error al obtener productos: ${error.message}`);
     }
@@ -12,20 +23,16 @@ export default class ProductManager {
 
   async getPaginated({ limit = 10, page = 1, sort, query }) {
     try {
-      // Construir filtro basado en query
       let filter = {};
       
       if (query) {
-        // Si query es "available" o "disponible", filtrar por status
         if (query.toLowerCase() === 'available' || query.toLowerCase() === 'disponible') {
           filter.status = true;
         } else {
-          // Si no, buscar por categoría
           filter.category = { $regex: query, $options: 'i' };
         }
       }
 
-      // Construir ordenamiento
       let sortOption = {};
       if (sort === 'asc') {
         sortOption.price = 1;
@@ -33,35 +40,27 @@ export default class ProductManager {
         sortOption.price = -1;
       }
 
-      // Calcular skip
-      const skip = (page - 1) * limit;
+      const options = {
+        page: page,
+        limit: limit,
+        sort: sortOption,
+        lean: true
+      };
 
-      // Obtener productos con filtros, ordenamiento y paginación
-      const products = await Product.find(filter)
-        .sort(sortOption)
-        .skip(skip)
-        .limit(limit);
+      const result = await Product.paginate(filter, options);
 
-      // Contar total de documentos que coinciden con el filtro
-      const totalDocs = await Product.countDocuments(filter);
-      const totalPages = Math.ceil(totalDocs / limit);
-
-      // Calcular páginas anterior y siguiente
-      const hasPrevPage = page > 1;
-      const hasNextPage = page < totalPages;
-      const prevPage = hasPrevPage ? page - 1 : null;
-      const nextPage = hasNextPage ? page + 1 : null;
+      const productsReady = result.docs.map(formatProduct);
 
       return {
-        products,
-        totalDocs,
-        limit,
-        page,
-        totalPages,
-        hasPrevPage,
-        hasNextPage,
-        prevPage,
-        nextPage
+        products: productsReady,
+        totalDocs: result.totalDocs,
+        limit: result.limit,
+        page: result.page,
+        totalPages: result.totalPages,
+        hasPrevPage: result.hasPrevPage,
+        hasNextPage: result.hasNextPage,
+        prevPage: result.prevPage,
+        nextPage: result.nextPage
       };
     } catch (error) {
       throw new Error(`Error al obtener productos paginados: ${error.message}`);
@@ -70,8 +69,8 @@ export default class ProductManager {
 
   async getById(id) {
     try {
-      const product = await Product.findById(id);
-      return product;
+      const product = await Product.findById(id).lean();
+      return formatProduct(product);
     } catch (error) {
       throw new Error(`Error al obtener producto: ${error.message}`);
     }
@@ -80,8 +79,8 @@ export default class ProductManager {
   async add(productInput) {
     try {
       const product = new Product(productInput);
-      await product.save();
-      return product;
+      const savedProduct = await product.save();
+      return savedProduct;
     } catch (error) {
       if (error.code === 11000) {
         throw new Error(`El código ${productInput.code} ya existe`);
@@ -112,5 +111,3 @@ export default class ProductManager {
     }
   }
 }
-
-

@@ -11,7 +11,6 @@ router.get("/", async (req, res) => {
     const products = await productManager.getAll();
     res.render("home", { products });
   } catch (err) {
-    console.error("Error en GET /:", err);
     res.status(500).send(`<h1>Error</h1><p>${err.message}</p>`);
   }
 });
@@ -21,12 +20,10 @@ router.get("/realtimeproducts", async (req, res) => {
     const products = await productManager.getAll();
     res.render("realTimeProducts", { products });
   } catch (err) {
-    console.error("Error en GET /realtimeproducts:", err);
     res.status(500).send(`<h1>Error</h1><p>${err.message}</p>`);
   }
 });
 
-// Ruta para productos con paginación
 router.get("/products", async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
@@ -36,7 +33,6 @@ router.get("/products", async (req, res) => {
 
     const result = await productManager.getPaginated({ limit, page, sort, query });
 
-    // Construir URLs de paginación
     const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}${req.path}`;
     const queryParams = new URLSearchParams();
     
@@ -69,12 +65,10 @@ router.get("/products", async (req, res) => {
       }
     });
   } catch (err) {
-    console.error("Error en GET /products:", err);
     res.status(500).send(`<h1>Error</h1><p>${err.message}</p>`);
   }
 });
 
-// Ruta para detalles de un producto específico
 router.get("/products/:pid", async (req, res) => {
   try {
     const product = await productManager.getById(req.params.pid);
@@ -83,21 +77,29 @@ router.get("/products/:pid", async (req, res) => {
     }
     res.render("productDetail", { product });
   } catch (err) {
-    console.error("Error en GET /products/:pid:", err);
     res.status(500).send(`<h1>Error</h1><p>${err.message}</p>`);
   }
 });
 
-// Ruta para ver un carrito específico
 router.get("/carts/:cid", async (req, res) => {
   try {
     const cart = await cartManager.getById(req.params.cid);
     if (!cart) {
       return res.status(404).send("<h1>Error 404</h1><p>Carrito no encontrado</p>");
     }
-    res.render("cart", { cart });
+    
+    const total = (cart.products || []).reduce(
+      (sum, item) => sum + (item.itemTotal || 0),
+      0
+    );
+    
+    res.render("cart", { 
+      cart: {
+        ...cart,
+        total
+      }
+    });
   } catch (err) {
-    console.error("Error en GET /carts/:cid:", err);
     res.status(500).send(`<h1>Error</h1><p>${err.message}</p>`);
   }
 });

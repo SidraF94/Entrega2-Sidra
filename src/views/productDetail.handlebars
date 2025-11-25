@@ -6,7 +6,7 @@
       <div class="product-images">
         {{#if product.thumbnails}}
           {{#each product.thumbnails}}
-            <img src="/api/images/{{../id}}/{{@index}}" alt="{{../title}}" class="product-detail-image">
+            <img src="/api/images/{{../product._id}}/{{@index}}" alt="{{../product.title}}" class="product-detail-image" onerror="this.style.display='none'">
           {{/each}}
         {{else}}
           <div class="product-image-placeholder large">Sin imagen</div>
@@ -32,7 +32,7 @@
         </div>
 
         <div class="product-actions">
-          <button onclick="addToCart('{{product.id}}')" class="btn btn-success btn-large" {{#unless product.status}}disabled{{/unless}}>
+          <button onclick="addToCart('{{product._id}}')" class="btn btn-success btn-large" {{#unless product.status}}disabled{{/unless}}>
             Agregar al Carrito
           </button>
         </div>
@@ -48,7 +48,6 @@
 <script>
   async function addToCart(productId) {
     try {
-      // Crear o obtener carrito
       const createCartResponse = await fetch('/api/carts', {
         method: 'POST',
         headers: {
@@ -56,10 +55,14 @@
         }
       });
       
+      if (!createCartResponse.ok) {
+        const errorData = await createCartResponse.json();
+        throw new Error(errorData.error || 'Error al crear carrito');
+      }
+      
       const cart = await createCartResponse.json();
       
-      // Agregar producto al carrito
-      const addResponse = await fetch(`/api/carts/${cart.id}/product/${productId}`, {
+      const addResponse = await fetch(`/api/carts/${cart._id}/product/${productId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -69,13 +72,13 @@
 
       if (addResponse.ok) {
         alert('Producto agregado al carrito!');
-        window.location.href = `/carts/${cart.id}`;
+        window.location.href = `/carts/${cart._id}`;
       } else {
-        alert('Error al agregar producto al carrito');
+        const errorData = await addResponse.json();
+        throw new Error(errorData.error || 'Error al agregar producto al carrito');
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error al agregar producto al carrito');
+      alert('Error: ' + error.message);
     }
   }
 </script>
